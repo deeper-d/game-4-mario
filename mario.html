@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mario</title>
+    <style>
+        canvas {
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h3 class="offset-label"></h3>
+        <canvas id="id-canvas" width="640" height="640"></canvas>
+
+        <div class='gua-controls'>
+            <button data-action='change_offset' data-offset='-1024'>-1024</button>
+            <button data-action='change_offset' data-offset='1024'>1024</button>
+            <button data-action='change_offset' data-offset='-16'>-16</button>
+            <button data-action='change_offset' data-offset='16'>16</button>
+            <button></button>
+        </div>
+
+    </div>
+    <script src="utils.js"></script>
+    <script>
+        const actions = {
+            change_offset(offset) {
+                window.offset += offset
+                e('h3').innerHTML = window.offset
+                drawNes(window.bytes)
+            }
+        }
+        const bindEvents = () => {
+            e('.gua-controls').addEventListener('click', (event) => {
+                let action = event.target.dataset.action
+                let offset = Number(event.target.dataset.offset)
+                actions[action] && actions[action](offset)
+            })
+
+        }
+
+        const drawBlocks = (context, data, x, y, pixelWidth) => {
+            const colors = [
+                'white',
+                '#FE1008',
+                '#FFB010',
+                '#AA3030'
+            ]
+
+            let w = pixelWidth
+            let h = pixelWidth
+
+            for (let i = 0; i < 8; i++) {
+                let p1 = data[i]
+                let p2 = data[i + 8]
+                for (let j = 0; j < 8; j++) {
+                    // 8 bits per line
+                    // 78 69  0100 1110  0100 0101
+                    // 在 j 循环中，每次画一个像素点
+                    let c1 = (p1 >> (7 - j)) & 0b00000001 // ?? 啥意思 ？
+                    let c2 = (p2 >> (7 - j)) & 0b00000001 // ?? 啥意思 ？
+                    let pixel = (c2 << 1) + c1  // ???
+                    let color = colors[pixel]
+                    context.fillStyle = color
+                    let px = x + j * w
+                    let py = y + i * h
+                    context.fillRect(px, py, w, h)
+
+                    // 这里是画了 16 * 64 = 1024 字节 
+                }
+            }
+
+        }
+
+        const drawNes = (bytes) => {
+            // 78 69  ？？ 为什么 78 69 是第一个方块
+            // 0100 1110  0100 0101
+            // 后面的bit和前面的bit叠在一起就是一个像素 ?? 怎么叠
+            // 两个 bit 叠在一起可以有四种颜色 0 1 2 3 ？？ 为什么
+            // 
+
+            let canvas = e('#id-canvas')
+            let context = canvas.getContext('2d')
+
+            let blockSize = 8 // 一个图块8像素
+            let pixelSize = 8 // 一个像素8位
+            let pixelWidth = 10 // 像素放大10
+            let numberOfBytesPerBlock = 16 // 16个字节一个图块
+
+            for (let i = 0; i < blockSize; i++) {
+                for (let j = 0; j < blockSize; j++) {
+                    // 算出 bytes
+                    // 横着画, x 坐标变化
+                    let x = j * pixelSize * pixelWidth
+                    let y = i * pixelSize * pixelWidth
+                    // 每一个图块16个字节，那你现在画第几个图块：按字节来找
+                    let index = (i * 8 + j) * numberOfBytesPerBlock + window.offset
+                    drawBlocks(context, bytes.slice(index), x, y, pixelWidth)
+
+                }
+            }
+
+
+        }
+    
+        const __main = () => {
+            window.offset = 0 // 32784
+            bindEvents()
+
+            let request = {
+                method: 'get',
+                url: 'mario.nes',
+                callback: (r) => {
+                    let bytes = new Uint8Array(r)
+                    window.bytes = bytes
+                    drawNes(bytes)
+                }
+            }
+            ajax(request)
+
+        }
+
+        __main()
+    </script>
+
+
+
+    <script>
+        /*
+        * bit: 比特,计算机最小的数据单位，1比特等于1或者0，是计算机处理、存储、传输数据时使用的二进制格式
+        * byte: 字节(1 Byte = 8 bits),用于描述数据文件大小、磁盘或者其他存储介质空间的容量或者通过网络传输的数据量的单位，1字节相当于8比特。通常用大写的B来表示Byte
+            1 kb = 1024 bytes =2^10 bytes 
+            1 mb = 1024 kb = 2^20 bytes 
+            1 gb = 1024 mb = 2^30 bytes 
+        * 电脑所有的信息都是二进制的，就是0和1组成的。
+        * 字节Byte是计算机数据处理的最小单位，习惯上用大写的B表示，
+        * 每个字节有8个二进制位，其中最右边的一位为最低位，最左边的一位为最高位，
+        * 每个二进制位的值不是0就是1。
+        * 一个字节由8个二进制位组成。
+        * 也就是1字节Byte等于8比特Bit。这也是计算机设计时规定的。
+        * 一个字节最大为8个1（11111111）即2的8次方，总共是256种状态。
+
+        第一集 图像提取
+        ** 做事情要尽量简单方便的方法
+        ** 没有什么是一促而就的，先把功能写出来再说，别追求完美迟迟不动
+
+        js 解包马里奥
+        nes 图像资源的格式是
+
+        每个图块:  8 * 8 像素
+        每个像素:  2 bits 
+        每个图块:  16 bytes ？？？（8*8*2 / 8）
+
+        每页 8 * 8 个图块 就是宽高都是64像素
+
+        10倍放大像素就是 640 像素
+
+        32784 开始
+        一排8个就是画出马里奥的一帧
+
+        * */
+    </script>
+
+</body>
+</html>
