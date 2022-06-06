@@ -13,6 +13,7 @@
     <div>
         <h3 class="offset-label"></h3>
         <canvas id="id-canvas" width="640" height="640"></canvas>
+        <canvas id="id-canvas-sprite" width="160" height="320"></canvas>
 
         <div class='gua-controls'>
             <button data-action='change_offset' data-offset='-1024'>-1024</button>
@@ -105,10 +106,32 @@
 
         }
     
+
+        const drawSprite = (data) => {
+            let canvas = e('#id-canvas-sprite')
+            let context = canvas.getContext('2d')
+            // 一个方块是像素的尺寸 * 像素的宽度
+            let pixelsPerBlock = 8
+            let pixelWidth = 10
+            let blockSize = pixelsPerBlock * pixelWidth // ??? 
+            let offset = 0
+            for (let i = 0; i < 4; i++) { // 竖着
+                for (let j = 0; j < 2; j++) { // 横着
+                    let x = j * blockSize
+                    let y = i * blockSize
+                    let pixels = data.slice(offset)
+                    // 一行马里奥拼成
+                    drawBlocks(context, pixels, x, y, pixelWidth)
+                    offset += 16
+                }
+            }
+
+
+        }
+
         const __main = () => {
             window.offset = 32784
-            bindEvents()
-
+            let tileOffset = 32784
             let request = {
                 method: 'get',
                 url: 'mario.nes',
@@ -116,10 +139,24 @@
                     let bytes = new Uint8Array(r)
                     window.bytes = bytes
                     drawNes(bytes)
+
+                    // 闭包： 外部的变量被内部的函数使用了
+                    let step = 0
+                    let bytesPerBlock = 16 // 一个图块16字节
+                    let tilesPerSprite = 8 // ?? tile是啥
+                    let bytesPerSprite = bytesPerBlock * tilesPerSprite
+
+                    setInterval(() => {
+                        let offset = tileOffset + step * bytesPerSprite
+                        drawSprite(bytes.slice(offset))
+                        step++
+                        step %= 4
+                    }, 200)
                 }
             }
             ajax(request)
 
+            bindEvents()
         }
 
         __main()
@@ -144,7 +181,7 @@
 
         第一集 图像提取
         ** 做事情要尽量简单方便的方法
-        ** 没有什么是一促而就的，先把功能写出来再说，别追求完美迟迟不动
+        ** 先写出来，再来写好。没有什么是一促而就的，先把功能写出来再说，别追求完美迟迟不动
 
         js 解包马里奥
         nes 图像资源的格式是
@@ -159,6 +196,11 @@
 
         32784 开始
         一排8个就是画出马里奥的一帧
+
+
+        第二集 动画
+        1.drawSprite 
+        一个马里奥 是由横着2个，竖着4个block（8*8pixcel）组成的
 
         * */
     </script>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>game 2 brick </title>
+    <style>
+        canvas {
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <canvas id="id-canvas" width="400" height="600"></canvas>
+        <canvas id="id-score" width="400" height="600" style="position: absolute; left: 0; top: 0; z-index:1;border: none"></canvas>
+
+        <br/>
+        <!-- <input id='id-input-speed' type="range" > -->
+
+    </div>
+
+    <div class='gua-controls'>
+        
+
+    </div>
+    <script src="guagame/utils.js"></script>
+    <script src="guagame/gua_game.js"></script>
+    <script src="guagame/gua_scene.js"></script>
+    <script src="guagame/gua_image.js"></script>
+    <!-- <script src="guagame/gua_particle_system.js"></script> -->
+    <script src="guagame/gua_lable.js"></script>
+    <script src="guagame/gua_animation.js"></script>
+
+
+    <script src="scene/main/level.js"></script>
+    <script src='scene/main/scene.js'></script>
+    <script src='scene/title/scene_title.js'></script>
+    <script src='scene/title/scene_end.js'></script>
+
+    <script src='config.js'></script>
+
+    <script src='main.js'></script>
+
+    <script>
+
+        var es =  sel => document.querySelectorAll(sel)
+
+        var bindAll = (sel, eventName, callback) => {
+            var l = es(sel)
+            for (let input of l) {
+                input.addEventListener(eventName, () => {
+                    callback(event)
+                })
+            }
+        }
+
+        var templateControl = function(key, item) {
+            var t = `
+            <div>
+            <label for="">
+                <input 
+                    max=300
+                    class="gua-auto-slider"
+                    type="range"
+                    value=${item.value}
+                    data-value='config.${key}'
+                >
+                ${item._comment} <span class='gua-label'></span>
+            </label>
+
+        </div>
+            `
+            return t
+        }
+        
+        var insertControls = function() {
+            var div = e('.gua-controls')
+            var keys = Object.keys(config)
+            for (var k of keys) {
+                var item = config[k]
+                var html = templateControl(k, item)
+                div.insertAdjacentHTML('beforeend', html)
+            }
+
+        }
+
+        var bindEvents = function() {
+            bindAll('.gua-auto-slider', 'input', () => {
+                var target = event.target
+                var bindVar = target.dataset.value
+                var v = target.value
+                eval(bindVar + '.value=' + v)
+                //
+                var label = target.closest('label').querySelector('.gua-label')
+                label.innerText = v
+            })
+        }
+
+        var __main = function() {
+            // 从配置文件生成 HTML 配件
+            insertControls()
+            // 绑定事件
+            bindEvents()
+
+        }
+
+        __main()
+
+        /*
+        *
+        第一集
+        1.画地面,地面动画 04：52
+        2.给 bird 做动画 13:53
+            - 旋转功能，更新角度 18：55
+            - drawImage 还可以指定xy画图
+        ** 写程序不是写英语
+        ** 新语言类似于新装备，厉害的人不是只追求外在的装备
+
+        第二集
+        1.加管子
+        2.抽离配置文件 config 21: 00
+          动态调整 pipe 的高度 
+          ** 混日子的人是追求热点
+          ** 有技术追求的人应该追求正确的东西？？
+        3.配置 scene debug 模式 38：00
+    
+        * */
+    </script>
+
+</body>
+</html>
