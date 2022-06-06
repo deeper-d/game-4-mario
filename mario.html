@@ -40,6 +40,12 @@
                 actions[action] && actions[action](offset)
             })
 
+            window.addEventListener('keydown', (e) => {
+                 if (e.key === 'p') {
+                    window.paused = !window.paused
+                }
+            })
+
         }
 
         const drawBlocks = (context, data, x, y, pixelWidth) => {
@@ -130,6 +136,7 @@
         }
 
         const __main = () => {
+            window.paused = false
             window.offset = 32784
             let tileOffset = 32784
             let request = {
@@ -149,8 +156,14 @@
                     setInterval(() => {
                         let offset = tileOffset + step * bytesPerSprite
                         drawSprite(bytes.slice(offset))
-                        step++
-                        step %= 4
+                        if (window.paused) {
+                            // 暂停
+
+                        } else {
+                            step++ 
+                            step %= 3
+                        }
+                        
                     }, 200)
                 }
             }
@@ -201,6 +214,10 @@
         第二集 动画
         1.drawSprite 
         一个马里奥 是由横着2个，竖着4个block（8*8pixcel）组成的
+
+        2.把马里奥动画放进动画框架里 23: 25
+        -- 参照gua_animation.js 原样复制创建马里奥类 gua_nes_sprite.js 31:24
+        ** 重点：如何一步步改造gua_nes_sprite的
 
         * */
     </script>

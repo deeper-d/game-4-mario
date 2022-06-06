@@ -71,14 +71,45 @@ var __mian = async function () {
 
     await loadImg(images, () => {
 
-        var game = Guagame.instance(20, images, (g) => {
-            // var scene = Scene.new(g)
-            var scene = SceneTitle.new(g)
-            g.runWithScene(scene)
-        })
-    
-        // enableDebugMode(true)
+        let request = {
+            method: 'get',
+            url: 'mario.nes',
+            callback: (r) => {
+                let bytes = new Uint8Array(r)
+                window.bytes = bytes
+                log('window.bytes', window.bytes)
+                
+                var game = Guagame.instance(20, images, (g) => {
+                    var scene = Scene.new(g)
+                    g.runWithScene(scene)
+                })
 
+        
+    
+                // 2
+                // 闭包： 外部的变量被内部的函数使用了
+                // let step = 0
+                // let bytesPerBlock = 16 // 一个图块16字节
+                // let tilesPerSprite = 8 // ?? tile是啥
+                // let bytesPerSprite = bytesPerBlock * tilesPerSprite
+    
+                // setInterval(() => {
+                //     let offset = tileOffset + step * bytesPerSprite
+                //     drawSprite(bytes.slice(offset))
+                //     if (window.paused) {
+                //         // 暂停
+    
+                //     } else {
+                //         step++ 
+                //         step %= 3
+                //     }
+                    
+                // }, 200)
+            }
+        }
+        ajax(request)
+
+    
     })
 
 }

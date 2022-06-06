@@ -1,14 +1,12 @@
 const log = console.log.bind(console)
 
-var imageFromPath = function (path) {
+const imageFromPath = function (path) {
     var img = new Image()
     img.src = path
-    console.log('v ', img.width)
     return img
 }
 
-
-var rectIntersects = function(a, b) {
+const rectIntersects = function(a, b) {
     // console.log('a ====', a)
     // if (b.y > a.y && b.y < a.y + a.w) {
     //     if (b.x > a.x && b.x < a.x + a.h) {
@@ -37,15 +35,27 @@ var rectIntersects = function(a, b) {
      return intersect
 }
 
-var randomBetween = (start, end) => {
+const randomBetween = (start, end) => {
     var n  = Math.random() * (end - start + 1)
     return Math.floor(n + start)
 }
 
-var es = sel => {
+const es = sel => {
     return document.querySelectorAll(sel)
 }
-var e = sel => {
-    console.log(sel)
+const e = sel => {
     return document.querySelector(sel)
 }
+
+const ajax = request => {
+     let r = new XMLHttpRequest()
+     r.open(request.method, request.url, true)
+     r.responseType = 'arraybuffer'
+     r.onreadystatechange = event => {
+          if (r.readyState === 4) {
+               request.callback(r.response)
+          }
+     }
+     r.send()
+}
+
