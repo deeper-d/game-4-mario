@@ -42,7 +42,7 @@ class Scene extends GuaScene {
     setupInputs() {
         var self = this
         var b = this.mario //this.bird
-        let playerSpeed = 5
+        let playerSpeed = 10
         self.game.registerAction('a', function (keyStatus) {
             b.move(-playerSpeed , keyStatus)
         })
