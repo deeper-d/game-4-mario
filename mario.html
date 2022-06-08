@@ -38,6 +38,7 @@
             <button data-action='change_offset' data-offset='1024'>1024</button>
             <button data-action='change_offset' data-offset='-16'>-16</button>
             <button data-action='change_offset' data-offset='16'>16</button>
+            <button data-action='clear_canvas' >clear</button>
             <button></button>
         </div>
 
@@ -72,10 +73,10 @@
                     let data = window.bytes.slice(window.tileOffset)
                     drawSprite(data, target, i, j, 1, 1)
                 }
-
-
-
-
+            },
+            clear_canvas() {
+                console.log('clear')
+                window.nesContext.clearRect(0, 0, 640, 640);
             }
         }
         const bindEvents = () => {
@@ -119,16 +120,15 @@
                     let c1 = (p1 >> (7 - j)) & 0b00000001 // ?? 啥意思 ？
                     let c2 = (p2 >> (7 - j)) & 0b00000001 // ?? 啥意思 ？
                     let pixel = (c2 << 1) + c1  // ???
-                    if (pixel != 0) {
+                    if (pixel !== 0) {
                         let color = colors[pixel]
                         context.fillStyle = color
+                        context.opacity = 0
                         let px = x + j * w
                         let py = y + i * h
                         context.fillRect(px, py, w, h)
                         // 这里是画了 16 * 64 = 1024 字节 
                     }
-                    
-                   
                 }
             }
 
@@ -143,6 +143,8 @@
 
             let canvas = e('#id-canvas')
             let context = canvas.getContext('2d')
+            // 每次画之前都重新清空画布
+            context.clearRect(0, 0, 640, 640);
 
             let blockSize = 8 // 一个图块8像素
             let pixelSize = 8 // 一个像素8位
