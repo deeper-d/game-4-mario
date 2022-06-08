@@ -18,27 +18,27 @@
         data-type='source' 
         width="640" height="640"></canvas>
 
+        <canvas id="id-canvas-tile"
+        data-action='draw_tile'
+        data-type='tile' 
+         width="160" height="160"></canvas>
+
         <canvas id="id-canvas-sprite"
         data-action='draw_tile'
         data-type='tile' 
          width="160" height="320"></canvas>
 
-         <canvas id=""
+         <!-- <canvas id=""
         data-action='draw_tile'
         data-type='tile' 
-         width="160" height="160"></canvas>
-
-         <canvas id=""
-        data-action='draw_tile'
-        data-type='tile' 
-         width="480" height="480"></canvas>
+         width="480" height="480"></canvas> -->
 
         <div class='gua-controls'>
             <button data-action='change_offset' data-offset='-1024'>-1024</button>
             <button data-action='change_offset' data-offset='1024'>1024</button>
             <button data-action='change_offset' data-offset='-16'>-16</button>
             <button data-action='change_offset' data-offset='16'>16</button>
-            <button data-action='clear_canvas' >clear</button>
+            <button data-action='clear_tile' data-selector='#id-canvas-tile'>clear tile</button>
             <button></button>
         </div>
 
@@ -74,9 +74,11 @@
                     drawSprite(data, target, i, j, 1, 1)
                 }
             },
-            clear_canvas() {
-                console.log('clear')
-                window.nesContext.clearRect(0, 0, 640, 640);
+            clear_tile(event) {
+                let target = event.target
+                let sel = target.dataset.selector
+                let context = e(sel).getContext('2d')
+                context.clearRect(0, 0, 640, 640);
             }
         }
         const bindEvents = () => {
@@ -302,6 +304,12 @@
          -- 给 canvas 绑定 click 事件
          -- draw_tile()
          -- 改造 drawSprite()
+
+         第四集 地图编辑器
+         -- 准备工作：画之前清空tile， 缩小素材图...
+         -- 依照 main/scene.js 创建 scene_editor.js 28:50
+         -- GuaTileMap 类 30:40
+         -- 摩擦力加速度 43:35
 
         * */
     </script>

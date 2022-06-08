@@ -24,6 +24,9 @@ class GuaNesSprite {
         // 重力和加速度
         this.gy = 10
         this.vy = 0
+        // 加速和摩擦
+        this.vx = 0
+        this.mx = 0
     }
 
     static new(game) {
@@ -99,20 +102,21 @@ class GuaNesSprite {
     }
 
     update() {
-        // // 更新alpha
-        // if (this.alpha > 0) {
-        //     this.alpha -= 0.05
-        // }
-        // // 更新角度
-        // if (this.ratation < 45) {
-        //     this.ratation += 5
-        // }
+        // 更新 x 加速和摩擦
+        this.vx += this.mx
+        // 说明摩擦力已经把速度降至 0 以下， 停止摩擦
+        if (this.vx * this.mx > 0) {
+            this.vx = 0
+            this.mx = 0
+        } else {
+            this.x += this.vx
+        }
 
         // 更新受力
         this.y += this.vy
         this.vy += this.gy * 0.05
         // 落地了
-        var h = 480
+        var h = 100
         if (this.y > h) {
             this.y = h
         }
@@ -124,6 +128,16 @@ class GuaNesSprite {
             this.frameIndex ++ 
             this.frameIndex %= 3
         }
+
+
+        // // 更新alpha
+        // if (this.alpha > 0) {
+        //     this.alpha -= 0.05
+        // }
+        // // 更新角度
+        // if (this.ratation < 45) {
+        //     this.ratation += 5
+        // }
     }
 
     draw() {
@@ -152,8 +166,14 @@ class GuaNesSprite {
     }
 
     move(x, keyStatus) {
-        this.x += x
         this.flipX = x < 0
+        // this.x += x
+        let s = 0.5 * x
+        if (keyStatus == 'down') {
+            this.vx += s
+            this.mx = -s/3
+        }
+
     }
 
     falldown() {
