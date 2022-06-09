@@ -7,11 +7,40 @@
         canvas {
             border: 1px solid gray;
         }
+        .gua-inline-block {
+            display: inline-block;
+            
+        }
+        img {
+                border: 1px dashed gray;
+            }
     </style>
 </head>
 <body>
     <div>
-        <canvas id="id-canvas" width="256" height="160"></canvas>
+        <canvas id="id-canvas" width="512" height="480"></canvas>
+        <div class="gua-inline-block">
+            <img 
+            src="tiles/block.png" 
+            data-id='block'
+            data-action='change_active_tile'
+             alt="">
+            <img 
+            src="tiles/coin.png" 
+            data-id='coin' 
+            data-action='change_active_tile'
+            alt="">
+            <img
+            src="tiles/ground.png" 
+            data-id='ground' 
+            data-action='change_active_tile'
+            alt="">
+            <img 
+            src="tiles/question.png" 
+            data-id='question' 
+            data-action='change_active_tile'
+            alt="">
+        </div>
         <br/>
     </div>
 
@@ -80,7 +109,22 @@
 
         }
 
+        const actions = {
+            change_active_tile(event) {
+                let id = event.target.dataset.id
+                log('change_active_tile', id)
+
+            }
+        }
+
         var bindEvents = function() {
+
+            // 绑定 click 事件
+            e('body').addEventListener('click', (event) => {
+                let action = event.target.dataset.action
+                actions[action] && actions[action](event)
+            })
+
             bindAll('.gua-auto-slider', 'input', () => {
                 var target = event.target
                 var bindVar = target.dataset.value
